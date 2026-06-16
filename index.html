@@ -19,256 +19,434 @@
 
     header {
       width: 100%;
-      padding: 1.5rem 2rem;
+      padding: 1rem 1.8rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 1rem;
       background: rgba(255,255,255,0.04);
       border-bottom: 1px solid rgba(255,255,255,0.08);
     }
+    header h1 { font-size: 1.4rem; font-weight: 700; white-space: nowrap; }
 
-    header h1 {
-      font-size: 1.6rem;
-      font-weight: 700;
-      letter-spacing: 0.02em;
+    #stats { display: flex; gap: 0.7rem; align-items: center; flex-wrap: wrap; }
+    .stat-pill {
+      background: #1a4f7a;
+      padding: 0.35rem 0.9rem;
+      border-radius: 2rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      white-space: nowrap;
     }
+    .stat-pill b { font-size: 1.1rem; }
 
-    #counter {
+    #toolbar {
+      width: 100%;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-      background: #1e6091;
-      padding: 0.5rem 1.1rem;
-      border-radius: 2rem;
-      font-size: 1rem;
-      font-weight: 600;
+      padding: 0.5rem 1.5rem;
+      gap: 0.8rem;
+      background: rgba(255,255,255,0.02);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      font-size: 0.8rem;
+      color: rgba(232,244,248,0.55);
+      flex-wrap: wrap;
     }
-
-    #counter span { font-size: 1.4rem; font-weight: 800; }
+    #toolbar button {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.18);
+      color: #e8f4f8;
+      padding: 0.28rem 0.85rem;
+      border-radius: 0.3rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    #toolbar button:hover { background: rgba(255,255,255,0.2); }
+    #zoom-info { margin-left: auto; font-size: 0.78rem; opacity: 0.4; white-space: nowrap; }
 
     #map-container {
       width: 100%;
-      max-width: 1200px;
-      padding: 1.5rem 1rem;
+      max-width: 1300px;
+      padding: 0.6rem 0.4rem;
       flex: 1;
+      overflow: hidden;
     }
+    svg { width: 100%; height: auto; display: block; cursor: grab; }
+    svg:active { cursor: grabbing; }
 
-    svg {
-      width: 100%;
-      height: auto;
-      display: block;
-    }
-
+    /* ── Countries ── */
     .country {
-      stroke: #1a3a5c;
+      stroke: #152f4a;
       stroke-width: 0.4px;
       cursor: pointer;
-      transition: fill 0.15s ease;
+      transition: fill .12s;
     }
+    .country.unvisited { fill: #263f58; }
+    .country.visited   { fill: #1a6e35; }
+    .country:hover.unvisited { fill: #3a6899; }
+    .country:hover.visited   { fill: #25a050; }
 
-    .country.unvisited { fill: #2a4a6a; }
-    .country.visited   { fill: #28a745; }
-
-    .country:hover.unvisited { fill: #3a6a9a; }
-    .country:hover.visited   { fill: #20c052; }
-
-    #graticule {
-      fill: none;
-      stroke: rgba(255,255,255,0.05);
+    /* ── Admin-1 regions ── */
+    .admin1 {
+      stroke: rgba(255,255,255,0.22);
       stroke-width: 0.4px;
+      cursor: pointer;
+      pointer-events: all;
+    }
+    .admin1.unvisited { fill: transparent; }
+    .admin1.visited   { fill: rgba(40,167,69,0.4); }
+    .admin1:hover.unvisited { fill: rgba(255,255,255,0.07); }
+    .admin1:hover.visited   { fill: rgba(40,167,69,0.6); }
+
+    /* ── Cities ── */
+    .city-dot {
+      fill: #f5c842;
+      stroke: rgba(13,27,42,0.7);
+      stroke-width: 0.8px;
+      pointer-events: none;
+    }
+    .city-label {
+      fill: rgba(255,255,255,0.9);
+      pointer-events: none;
+      paint-order: stroke;
+      stroke: #0d1b2a;
+      stroke-width: 2.5px;
     }
 
-    #sphere { fill: #091524; }
+    /* ── Base ── */
+    #sphere    { fill: #060f1a; }
+    #graticule { fill: none; stroke: rgba(255,255,255,0.05); stroke-width: 0.3px; }
 
+    /* ── Tooltip ── */
     #tooltip {
       position: fixed;
-      background: rgba(10, 25, 45, 0.92);
-      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(8, 20, 38, 0.95);
+      border: 1px solid rgba(255,255,255,0.18);
       color: #e8f4f8;
       padding: 0.45rem 0.9rem;
       border-radius: 0.4rem;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       pointer-events: none;
       opacity: 0;
-      transition: opacity 0.1s;
-      z-index: 10;
-      white-space: nowrap;
+      transition: opacity .08s;
+      z-index: 200;
+      max-width: 220px;
     }
+    .tt-name   { font-weight: 700; font-size: 0.95rem; }
+    .tt-sub    { font-size: 0.78rem; opacity: 0.7; margin-top: 2px; }
 
+    /* ── Legend ── */
     #legend {
-      display: flex;
-      gap: 1.5rem;
-      padding: 0 1rem 1.2rem;
-      font-size: 0.85rem;
-      opacity: 0.8;
+      display: flex; flex-wrap: wrap;
+      gap: 1rem; padding: 0.6rem 1.5rem;
+      font-size: 0.78rem; opacity: 0.65;
     }
+    .li { display: flex; align-items: center; gap: 0.4rem; }
+    .ld {
+      width: 12px; height: 12px; border-radius: 2px; flex-shrink: 0;
+    }
+    .ld-u { background:#263f58; border:1px solid #3a6899; }
+    .ld-v { background:#1a6e35; }
+    .ld-r { background:rgba(40,167,69,0.45); border:1px solid rgba(40,167,69,0.7); }
+    .ld-c { background:#f5c842; border-radius:50%; width:9px; height:9px; }
 
-    .legend-item { display: flex; align-items: center; gap: 0.45rem; }
-    .legend-dot {
-      width: 14px; height: 14px; border-radius: 3px;
+    /* ── Loading badge ── */
+    #loading {
+      position:fixed; bottom:1rem; right:1rem;
+      background:rgba(26,79,122,0.9); color:#fff;
+      padding:.35rem .9rem; border-radius:.4rem;
+      font-size:.78rem; display:none; z-index:300;
     }
-    .legend-dot.unvisited { background: #2a4a6a; border: 1px solid #3a6a9a; }
-    .legend-dot.visited   { background: #28a745; }
   </style>
 </head>
 <body>
 
 <header>
   <h1>🌍 Mes Voyages</h1>
-  <div id="counter"><span id="count">0</span> pays visité(s)</div>
+  <div id="stats">
+    <div class="stat-pill"><b id="cnt-countries">0</b> pays visité(s)</div>
+    <div class="stat-pill"><b id="cnt-regions">0</b> région(s) visitée(s)</div>
+  </div>
 </header>
+
+<div id="toolbar">
+  <button id="btn-reset">🌐 Vue monde</button>
+  <span>Molette / pinch = zoom &nbsp;·&nbsp; Glisser = déplacer &nbsp;·&nbsp; Clic = marquer visité</span>
+  <span id="zoom-info">×1.0 — pays</span>
+</div>
 
 <div id="map-container">
   <svg id="map" viewBox="0 0 960 500"></svg>
 </div>
 
 <div id="legend">
-  <div class="legend-item"><div class="legend-dot unvisited"></div> Non visité</div>
-  <div class="legend-item"><div class="legend-dot visited"></div> Visité — cliquez pour basculer</div>
+  <div class="li"><div class="ld ld-u"></div>Pays non visité</div>
+  <div class="li"><div class="ld ld-v"></div>Pays visité</div>
+  <div class="li"><div class="ld ld-r"></div>Région visitée (zoom ×2.5+)</div>
+  <div class="li"><div class="ld ld-c"></div>Ville principale (zoom ×4.5+)</div>
 </div>
 
-<div id="tooltip"></div>
+<div id="tooltip">
+  <div class="tt-name" id="tt-name"></div>
+  <div class="tt-sub"  id="tt-sub"></div>
+</div>
+<div id="loading">Chargement…</div>
 
 <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
 <script>
-const STORAGE_KEY = 'visited_countries';
+// ── Persistence ───────────────────────────────────────────────────────────────
+const SK_C = 'travelmap_countries_v2';
+const SK_R = 'travelmap_regions_v2';
+function loadSet(k) { try { return new Set(JSON.parse(localStorage.getItem(k))||[]); } catch { return new Set(); } }
+function saveSet(k, s) { localStorage.setItem(k, JSON.stringify([...s])); }
 
-function loadVisited() {
-  try { return new Set(JSON.parse(localStorage.getItem(STORAGE_KEY)) || []); }
-  catch { return new Set(); }
+const visitedC = loadSet(SK_C);
+const visitedR = loadSet(SK_R);
+
+// ── DOM ───────────────────────────────────────────────────────────────────────
+const ttEl     = document.getElementById('tooltip');
+const ttName   = document.getElementById('tt-name');
+const ttSub    = document.getElementById('tt-sub');
+const loadingEl= document.getElementById('loading');
+const zoomInfo = document.getElementById('zoom-info');
+
+function updateStats() {
+  document.getElementById('cnt-countries').textContent = visitedC.size;
+  document.getElementById('cnt-regions').textContent   = visitedR.size;
 }
 
-function saveVisited(set) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify([...set]));
-}
-
-let visited = loadVisited();
+// ── Projection & path ─────────────────────────────────────────────────────────
+const W = 960, H = 500;
+const projection = d3.geoNaturalEarth1().scale(153).translate([W/2, H/2]);
+const geoPath    = d3.geoPath().projection(projection);
 
 const svg = d3.select('#map');
-const tooltip = document.getElementById('tooltip');
-const countEl = document.getElementById('count');
 
-const projection = d3.geoNaturalEarth1()
-  .scale(153)
-  .translate([480, 250]);
+// Layer order (bottom → top)
+const layerBase    = svg.append('g').attr('id','l-base');
+const layerCountry = svg.append('g').attr('id','l-country');
+const layerAdmin1  = svg.append('g').attr('id','l-admin1').style('display','none');
+const layerCities  = svg.append('g').attr('id','l-cities').style('display','none');
 
-const path = d3.geoPath().projection(projection);
+// Background sphere & graticule
+layerBase.append('path').datum({type:'Sphere'})
+  .attr('id','sphere').attr('d',geoPath);
+layerBase.append('path').datum(d3.geoGraticule()())
+  .attr('id','graticule').attr('d',geoPath);
 
-svg.append('path')
-  .datum({ type: 'Sphere' })
-  .attr('id', 'sphere')
-  .attr('d', path);
+// ── Zoom ──────────────────────────────────────────────────────────────────────
+const THRESH_ADMIN1 = 2.5;
+const THRESH_CITIES = 4.5;
+let currentK = 1;
+let admin1Ready = false;
+let citiesReady = false;
 
-svg.append('path')
-  .datum(d3.geoGraticule()())
-  .attr('id', 'graticule')
-  .attr('d', path);
+const zoomBehavior = d3.zoom()
+  .scaleExtent([1, 30])
+  .on('zoom', onZoom);
 
-const g = svg.append('g');
+svg.call(zoomBehavior);
 
-function updateCount() {
-  countEl.textContent = visited.size;
+document.getElementById('btn-reset').addEventListener('click', () => {
+  svg.transition().duration(650)
+    .call(zoomBehavior.transform, d3.zoomIdentity);
+});
+
+function onZoom(event) {
+  const t  = event.transform;
+  currentK = t.k;
+
+  [layerBase, layerCountry, layerAdmin1, layerCities].forEach(l => l.attr('transform', t));
+
+  // Adaptive stroke widths
+  layerCountry.selectAll('.country').attr('stroke-width', 0.5 / currentK);
+  layerAdmin1 .selectAll('.admin1') .attr('stroke-width', 0.5 / currentK);
+
+  // Admin-1 layer
+  if (currentK >= THRESH_ADMIN1) {
+    layerAdmin1.style('display', null);
+    if (!admin1Ready) { admin1Ready = true; loadAdmin1(); }
+  } else {
+    layerAdmin1.style('display','none');
+  }
+
+  // Cities layer
+  if (currentK >= THRESH_CITIES) {
+    layerCities.style('display', null);
+    if (!citiesReady) { citiesReady = true; loadCities(); }
+  } else {
+    layerCities.style('display','none');
+  }
+
+  // Scale city dots & labels inversely
+  layerCities.selectAll('.city-dot').attr('r', 3.5 / currentK);
+  layerCities.selectAll('.city-label').attr('font-size', `${9 / currentK}px`);
+
+  // HUD
+  const layer = currentK >= THRESH_CITIES ? 'villes'
+              : currentK >= THRESH_ADMIN1  ? 'régions'
+              : 'pays';
+  zoomInfo.textContent = `×${currentK.toFixed(1)} — ${layer}`;
 }
 
-fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
+// ── Country names (ISO numeric) ───────────────────────────────────────────────
+const NAMES = {
+  4:"Afghanistan",8:"Albanie",12:"Algérie",24:"Angola",28:"Antigua-et-Barbuda",
+  31:"Azerbaïdjan",32:"Argentine",36:"Australie",40:"Autriche",44:"Bahamas",
+  48:"Bahreïn",50:"Bangladesh",51:"Arménie",52:"Barbade",56:"Belgique",
+  60:"Bermudes",64:"Bhoutan",68:"Bolivie",70:"Bosnie-Herzégovine",72:"Botswana",
+  76:"Brésil",84:"Belize",96:"Brunei",100:"Bulgarie",104:"Myanmar",108:"Burundi",
+  112:"Biélorussie",116:"Cambodge",120:"Cameroun",124:"Canada",132:"Cap-Vert",
+  140:"Centrafrique",144:"Sri Lanka",148:"Tchad",152:"Chili",156:"Chine",
+  158:"Taïwan",170:"Colombie",174:"Comores",175:"Mayotte",178:"Congo",
+  180:"Congo (RDC)",188:"Costa Rica",191:"Croatie",192:"Cuba",196:"Chypre",
+  203:"Tchéquie",204:"Bénin",208:"Danemark",214:"Rép. dominicaine",218:"Équateur",
+  222:"El Salvador",231:"Éthiopie",232:"Érythrée",233:"Estonie",246:"Finlande",
+  250:"France",258:"Polynésie française",262:"Djibouti",266:"Gabon",268:"Géorgie",
+  270:"Gambie",275:"Palestine",276:"Allemagne",288:"Ghana",300:"Grèce",
+  304:"Groenland",308:"Grenade",320:"Guatemala",324:"Guinée",328:"Guyana",
+  332:"Haïti",340:"Honduras",344:"Hong Kong",348:"Hongrie",352:"Islande",
+  356:"Inde",360:"Indonésie",364:"Iran",368:"Irak",372:"Irlande",376:"Israël",
+  380:"Italie",384:"Côte d'Ivoire",388:"Jamaïque",392:"Japon",398:"Kazakhstan",
+  400:"Jordanie",404:"Kenya",408:"Corée du Nord",410:"Corée du Sud",414:"Koweït",
+  417:"Kirghizistan",418:"Laos",422:"Liban",426:"Lesotho",428:"Lettonie",
+  430:"Libéria",434:"Libye",440:"Lituanie",442:"Luxembourg",450:"Madagascar",
+  454:"Malawi",458:"Malaisie",466:"Mali",478:"Mauritanie",480:"Maurice",
+  484:"Mexique",496:"Mongolie",498:"Moldavie",499:"Monténégro",504:"Maroc",
+  508:"Mozambique",512:"Oman",516:"Namibie",524:"Népal",528:"Pays-Bas",
+  540:"Nouvelle-Calédonie",554:"Nouvelle-Zélande",558:"Nicaragua",562:"Niger",
+  566:"Nigéria",578:"Norvège",586:"Pakistan",591:"Panama",598:"Papouasie-NG",
+  600:"Paraguay",604:"Pérou",608:"Philippines",616:"Pologne",620:"Portugal",
+  624:"Guinée-Bissau",630:"Porto Rico",634:"Qatar",638:"La Réunion",
+  642:"Roumanie",643:"Russie",646:"Rwanda",682:"Arabie saoudite",686:"Sénégal",
+  688:"Serbie",694:"Sierra Leone",702:"Singapour",703:"Slovaquie",705:"Slovénie",
+  706:"Somalie",710:"Afrique du Sud",716:"Zimbabwe",724:"Espagne",729:"Soudan",
+  740:"Suriname",748:"Eswatini",752:"Suède",756:"Suisse",760:"Syrie",
+  762:"Tadjikistan",764:"Thaïlande",768:"Togo",780:"Trinité-et-Tobago",
+  784:"ÉAU",788:"Tunisie",792:"Turquie",795:"Turkménistan",800:"Ouganda",
+  804:"Ukraine",807:"Macédoine du Nord",818:"Égypte",826:"Royaume-Uni",
+  834:"Tanzanie",840:"États-Unis",854:"Burkina Faso",858:"Uruguay",
+  860:"Ouzbékistan",862:"Venezuela",887:"Yémen",894:"Zambie",
+};
+
+// ── Countries ─────────────────────────────────────────────────────────────────
+fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json')
   .then(r => r.json())
   .then(world => {
     const countries = topojson.feature(world, world.objects.countries);
 
-    // ISO numeric → name lookup using d3 built-in (via a small embedded map)
-    const names = getCountryNames();
-
-    g.selectAll('.country')
+    layerCountry.selectAll('.country')
       .data(countries.features)
       .join('path')
-      .attr('class', d => `country ${visited.has(d.id) ? 'visited' : 'unvisited'}`)
-      .attr('d', path)
-      .on('mousemove', (event, d) => {
-        const name = names[d.id] || `Pays #${d.id}`;
-        tooltip.style.opacity = '1';
-        tooltip.style.left = (event.clientX + 14) + 'px';
-        tooltip.style.top  = (event.clientY - 28) + 'px';
-        tooltip.textContent = name + (visited.has(d.id) ? ' ✓' : '');
+      .attr('class', d => `country ${visitedC.has(String(d.id)) ? 'visited' : 'unvisited'}`)
+      .attr('d', geoPath)
+      .on('mousemove', (ev, d) => {
+        const name = NAMES[d.id] || `Pays #${d.id}`;
+        const hint = visitedC.has(String(d.id)) ? '✓ Visité — cliquer pour retirer' : 'Cliquer pour marquer visité';
+        showTip(ev, name, hint);
       })
-      .on('mouseleave', () => { tooltip.style.opacity = '0'; })
-      .on('click', (event, d) => {
-        if (visited.has(d.id)) {
-          visited.delete(d.id);
-          d3.select(event.currentTarget).attr('class', 'country unvisited');
-        } else {
-          visited.add(d.id);
-          d3.select(event.currentTarget).attr('class', 'country visited');
-        }
-        saveVisited(visited);
-        updateCount();
+      .on('mouseleave', hideTip)
+      .on('click', (ev, d) => {
+        ev.stopPropagation();
+        const id = String(d.id);
+        const el = d3.select(ev.currentTarget);
+        if (visitedC.has(id)) { visitedC.delete(id); el.attr('class','country unvisited'); }
+        else                  { visitedC.add(id);    el.attr('class','country visited');   }
+        saveSet(SK_C, visitedC);
+        updateStats();
       });
 
-    updateCount();
+    updateStats();
   });
 
-// ISO 3166-1 numeric → French country name
-function getCountryNames() {
-  return {
-    4:"Afghanistan",8:"Albanie",12:"Algérie",24:"Angola",32:"Argentine",36:"Australie",
-    40:"Autriche",50:"Bangladesh",56:"Belgique",64:"Bhoutan",68:"Bolivie",76:"Brésil",
-    100:"Bulgarie",104:"Myanmar",116:"Cambodge",120:"Cameroun",124:"Canada",144:"Sri Lanka",
-    152:"Chili",156:"Chine",170:"Colombie",180:"Congo (RDC)",188:"Costa Rica",191:"Croatie",
-    192:"Cuba",196:"Chypre",203:"Tchéquie",204:"Bénin",208:"Danemark",214:"Rép. dominicaine",
-    218:"Équateur",818:"Égypte",222:"El Salvador",231:"Éthiopie",246:"Finlande",251:"France",
-    250:"France",276:"Allemagne",288:"Ghana",300:"Grèce",320:"Guatemala",332:"Haïti",
-    340:"Honduras",348:"Hongrie",356:"Inde",360:"Indonésie",364:"Iran",368:"Irak",
-    372:"Irlande",376:"Israël",380:"Italie",388:"Jamaïque",392:"Japon",400:"Jordanie",
-    398:"Kazakhstan",404:"Kenya",408:"Corée du Nord",410:"Corée du Sud",414:"Koweït",
-    418:"Laos",422:"Liban",434:"Libye",440:"Lituanie",442:"Luxembourg",484:"Mexique",
-    504:"Maroc",508:"Mozambique",516:"Namibie",524:"Népal",528:"Pays-Bas",554:"Nouvelle-Zélande",
-    558:"Nicaragua",566:"Nigéria",578:"Norvège",586:"Pakistan",591:"Panama",604:"Pérou",
-    608:"Philippines",616:"Pologne",620:"Portugal",630:"Porto Rico",634:"Qatar",
-    642:"Roumanie",643:"Russie",682:"Arabie saoudite",686:"Sénégal",694:"Sierra Leone",
-    703:"Slovaquie",706:"Somalie",710:"Afrique du Sud",724:"Espagne",729:"Soudan",
-    752:"Suède",756:"Suisse",760:"Syrie",764:"Thaïlande",788:"Tunisie",792:"Turquie",
-    800:"Ouganda",804:"Ukraine",784:"Émirats arabes unis",826:"Royaume-Uni",
-    840:"États-Unis",858:"Uruguay",860:"Ouzbékistan",862:"Venezuela",704:"Viêt Nam",
-    887:"Yémen",894:"Zambie",716:"Zimbabwe",32:"Argentine",288:"Ghana",566:"Nigéria",
-    12:"Algérie",466:"Mali",562:"Niger",686:"Sénégal",854:"Burkina Faso",
-    768:"Togo",384:"Côte d'Ivoire",324:"Guinée",204:"Bénin",466:"Mali",
-    478:"Mauritanie",270:"Gambie",624:"Guinée-Bissau",132:"Cap-Vert",
-    174:"Comores",450:"Madagascar",454:"Malawi",480:"Maurice",638:"Réunion",
-    690:"Seychelles",646:"Rwanda",108:"Burundi",646:"Rwanda",834:"Tanzanie",
-    426:"Lesotho",748:"Eswatini",72:"Botswana",516:"Namibie",
-    180:"Congo (RDC)",178:"Congo",266:"Gabon",140:"Centrafrique",
-    148:"Tchad",818:"Égypte",262:"Djibouti",232:"Érythrée",706:"Somalie",
-    214:"Rép. dominicaine",332:"Haïti",388:"Jamaïque",192:"Cuba",630:"Porto Rico",
-    84:"Belize",320:"Guatemala",340:"Honduras",222:"El Salvador",558:"Nicaragua",
-    188:"Costa Rica",591:"Panama",218:"Équateur",170:"Colombie",
-    862:"Venezuela",328:"Guyana",740:"Suriname",600:"Paraguay",68:"Bolivie",
-    604:"Pérou",152:"Chili",32:"Argentine",858:"Uruguay",
-    792:"Turquie",268:"Géorgie",51:"Arménie",31:"Azerbaïdjan",792:"Turquie",
-    760:"Syrie",422:"Liban",400:"Jordanie",376:"Israël",275:"Palestine",
-    682:"Arabie saoudite",887:"Yémen",512:"Oman",784:"Émirats arabes unis",
-    634:"Qatar",48:"Bahreïn",414:"Koweït",368:"Irak",
-    364:"Iran",4:"Afghanistan",586:"Pakistan",144:"Sri Lanka",
-    524:"Népal",64:"Bhoutan",356:"Inde",50:"Bangladesh",
-    524:"Népal",418:"Laos",116:"Cambodge",704:"Viêt Nam",
-    764:"Thaïlande",104:"Myanmar",360:"Indonésie",458:"Malaisie",
-    702:"Singapour",608:"Philippines",608:"Philippines",
-    496:"Mongolie",156:"Chine",158:"Taïwan",392:"Japon",
-    410:"Corée du Sud",408:"Corée du Nord",
-    112:"Biélorussie",348:"Hongrie",616:"Pologne",804:"Ukraine",
-    498:"Moldavie",642:"Roumanie",100:"Bulgarie",300:"Grèce",
-    8:"Albanie",191:"Croatie",688:"Serbie",807:"Macédoine du Nord",
-    70:"Bosnie-Herzégovine",499:"Monténégro",705:"Slovénie",
-    440:"Lituanie",428:"Lettonie",233:"Estonie",
-    246:"Finlande",578:"Norvège",752:"Suède",208:"Danemark",
-    352:"Islande",372:"Irlande",826:"Royaume-Uni",
-    528:"Pays-Bas",56:"Belgique",442:"Luxembourg",
-    276:"Allemagne",40:"Autriche",756:"Suisse",
-    380:"Italie",620:"Portugal",724:"Espagne",250:"France",
-    470:"Malte",196:"Chypre",
-    398:"Kazakhstan",417:"Kirghizistan",762:"Tadjikistan",
-    795:"Turkménistan",860:"Ouzbékistan",
-  };
+// ── Admin-1 (lazy) ────────────────────────────────────────────────────────────
+function regionKey(d) {
+  const p = d.properties;
+  return p.iso_3166_2 || `${p.adm0_a3 || ''}-${p.name || d.id}`;
 }
+
+function loadAdmin1() {
+  loadingEl.style.display = 'block';
+  fetch('https://cdn.jsdelivr.net/gh/nvkelso/natural-earth-vector@master/geojson/ne_110m_admin_1_states_provinces.geojson')
+    .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(data => {
+      loadingEl.style.display = 'none';
+      layerAdmin1.selectAll('.admin1')
+        .data(data.features)
+        .join('path')
+        .attr('class', d => `admin1 ${visitedR.has(regionKey(d)) ? 'visited' : 'unvisited'}`)
+        .attr('d', geoPath)
+        .on('mousemove', (ev, d) => {
+          const p   = d.properties;
+          const name = p.name || '—';
+          const type = p.type_en || 'Région';
+          const ctry = p.admin  || '';
+          const vis  = visitedR.has(regionKey(d));
+          showTip(ev, name, `${type} · ${ctry}${vis ? ' · ✓ Visité' : ''}`);
+        })
+        .on('mouseleave', hideTip)
+        .on('click', (ev, d) => {
+          ev.stopPropagation();
+          const key = regionKey(d);
+          const el  = d3.select(ev.currentTarget);
+          if (visitedR.has(key)) { visitedR.delete(key); el.attr('class','admin1 unvisited'); }
+          else                   { visitedR.add(key);    el.attr('class','admin1 visited');   }
+          saveSet(SK_R, visitedR);
+          updateStats();
+        });
+    })
+    .catch(() => { loadingEl.textContent = 'Erreur chargement régions'; setTimeout(()=>loadingEl.style.display='none',3000); });
+}
+
+// ── Cities (lazy) ─────────────────────────────────────────────────────────────
+function loadCities() {
+  fetch('https://cdn.jsdelivr.net/gh/nvkelso/natural-earth-vector@master/geojson/ne_50m_populated_places_simple.geojson')
+    .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(data => {
+      // Keep capitals + cities > 300k pop
+      const cities = data.features.filter(f => {
+        const p = f.properties;
+        return p.featurecla === 'Admin-0 capital' || (p.pop_max || 0) > 300000;
+      });
+
+      const k = currentK; // current zoom at load time
+
+      const grp = layerCities.selectAll('.city-g')
+        .data(cities)
+        .join('g')
+        .attr('class', 'city-g')
+        .attr('transform', d => {
+          const c = d.geometry.coordinates;
+          const [x, y] = projection(c);
+          return `translate(${x},${y})`;
+        });
+
+      grp.append('circle')
+        .attr('class', 'city-dot')
+        .attr('r', 3.5 / k);
+
+      grp.append('text')
+        .attr('class', 'city-label')
+        .attr('dx', d => (5 / k) + 'px')
+        .attr('dy', d => (3 / k) + 'px')
+        .attr('font-size', `${9 / k}px`)
+        .text(d => d.properties.name);
+    })
+    .catch(() => {}); // cities are optional — fail silently
+}
+
+// ── Tooltip ───────────────────────────────────────────────────────────────────
+function showTip(ev, name, sub = '') {
+  ttName.textContent = name;
+  ttSub.textContent  = sub;
+  ttSub.style.display = sub ? '' : 'none';
+  ttEl.style.opacity = '1';
+  ttEl.style.left    = (ev.clientX + 14) + 'px';
+  ttEl.style.top     = (ev.clientY - 40) + 'px';
+}
+function hideTip() { ttEl.style.opacity = '0'; }
 </script>
 </body>
 </html>
